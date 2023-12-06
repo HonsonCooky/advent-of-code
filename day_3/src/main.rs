@@ -66,11 +66,9 @@ fn evaluate_line(line: String, line_num: usize) -> Vec<Token> {
 
     if (&buf).len() > 0 {
         let token = tokenizer(&buf, line_num, (start_index, line.len() - 1));
-        println!("{:?}", token);
         tokens.push(token);
     }
 
-    println!("{:?}", tokens);
     return tokens;
 }
 
