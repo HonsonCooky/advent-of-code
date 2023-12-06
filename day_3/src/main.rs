@@ -93,8 +93,13 @@ fn tokens_in_proximity(part: &Token, other: &Token) -> bool {
 
 fn evalute_token(token: &Token, tokens: &Vec<Token>) -> usize {
     // Ignore non-part tokens
-    if let TokenType::Value(_) = token.token_type {
-        return 0;
+    match &token.token_type {
+        TokenType::Part(p) => {
+            if p.chars().next().unwrap() != '*' {
+                return 0;
+            }
+        }
+        TokenType::Value(_) => return 0,
     }
 
     let tokens_iter = tokens.into_iter();
@@ -104,9 +109,12 @@ fn evalute_token(token: &Token, tokens: &Vec<Token>) -> usize {
             TokenType::Part(_) => 0,
             TokenType::Value(i) => i,
         })
-        .sum::<usize>();
-    println!("{:?} => {}", token, adjacents);
-    adjacents
+        .collect::<Vec<usize>>();
+
+    if (&adjacents).len() == 2 {
+        return adjacents.into_iter().product();
+    }
+    0
 }
 
 fn main() {
