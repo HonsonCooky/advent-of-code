@@ -1,8 +1,8 @@
-use std::{fs, u32, usize};
+use std::{collections::HashMap, fs, u32, usize};
 
 #[derive(Debug)]
 struct Card {
-    title: String,
+    title: usize,
     win_nums: Vec<usize>,
     our_nums: Vec<usize>,
 }
@@ -19,9 +19,10 @@ impl Card {
         }
     }
 
-    fn title(line: &String) -> String {
+    fn title(line: &String) -> usize {
         let mut split = line.split(":");
-        String::from(split.next().unwrap())
+        let title_split = split.next().unwrap().split(" ").collect::<Vec<&str>>();
+        title_split.last().unwrap().parse::<usize>().unwrap()
     }
 
     fn winning_numbers(line: &String) -> Vec<usize> {
@@ -53,24 +54,43 @@ impl Card {
     }
 }
 
+fn rec_find_win_cards(current: &Card, cards: &Vec<Card>, prev_registry: &mut Vec<Card>) {
+    let wins = current.num_of_wins();
+    if wins == 0 {
+        return;
+    }
+
+    for i in (current.title + 1..=current.title + wins) {}
+
+    return;
+}
+
 fn main() {
-    let file = fs::read_to_string("input.txt").unwrap();
+    let file = fs::read_to_string("sample.txt").unwrap();
     let mut cards: Vec<Card> = Vec::new();
     for line in file.lines() {
         cards.push(Card::new(String::from(line)));
     }
 
-    let mut sum = 0;
+    let mut won_cards: HashMap<usize, usize> = HashMap::new();
+
+    // Evaluate all "original" cards
     for card in &cards {
-        let num_of_wins = card.num_of_wins();
-        let pow = if num_of_wins > 0 {
-            num_of_wins - 1
-        } else {
-            continue;
-        };
-        let points = (2 as usize).pow(pow as u32);
-        println!("{:?} => {} = {}", card, card.num_of_wins(), points);
-        sum += points;
+        rec_find_win_cards(card, &cards, &mut Vec::new());
     }
-    println!("Sum: {sum}");
+
+    // PART ONE
+    // let mut sum = 0;
+    // for card in &cards {
+    //     let num_of_wins = card.num_of_wins();
+    //     let pow = if num_of_wins > 0 {
+    //         num_of_wins - 1
+    //     } else {
+    //         continue;
+    //     };
+    //     let points = (2 as usize).pow(pow as u32);
+    //     println!("{:?} => {} = {}", card, card.num_of_wins(), points);
+    //     sum += points;
+    // }
+    // println!("Sum: {sum}");
 }
