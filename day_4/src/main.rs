@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs, u32, usize};
+use std::fs;
 
 #[derive(Debug)]
 struct Card {
@@ -54,30 +54,42 @@ impl Card {
     }
 }
 
-fn rec_find_win_cards(current: &Card, cards: &Vec<Card>, prev_registry: &mut Vec<Card>) {
+fn rec_find_win_cards(current: &Card, cards: &Vec<Card>) -> Vec<usize> {
     let wins = current.num_of_wins();
     if wins == 0 {
-        return;
+        return Vec::new();
     }
 
-    for i in (current.title + 1..=current.title + wins) {}
-
-    return;
+    (current.title..current.title + wins)
+        .filter(|i| i < &cards.len())
+        .collect()
 }
 
 fn main() {
-    let file = fs::read_to_string("sample.txt").unwrap();
+    let file = fs::read_to_string("input.txt").unwrap();
     let mut cards: Vec<Card> = Vec::new();
     for line in file.lines() {
         cards.push(Card::new(String::from(line)));
     }
 
-    let mut won_cards: HashMap<usize, usize> = HashMap::new();
-
     // Evaluate all "original" cards
+    let mut sum = 0;
+    let mut copy_indexes: Vec<usize> = Vec::new();
     for card in &cards {
-        rec_find_win_cards(card, &cards, &mut Vec::new());
+        sum += 1; // for the current card
+        let copies = rec_find_win_cards(card, &cards);
+        sum += &copies.len();
+        copy_indexes.extend(copies);
     }
+
+    while let Some(i) = copy_indexes.pop() {
+        let card = &cards.get(i).unwrap();
+        let copies = rec_find_win_cards(card, &cards);
+        sum += &copies.len();
+        copy_indexes.extend(copies);
+    }
+
+    println!("Sum: {}", sum);
 
     // PART ONE
     // let mut sum = 0;
