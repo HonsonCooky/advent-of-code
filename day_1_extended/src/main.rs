@@ -6,7 +6,7 @@ use std::fs;
 fn main() {
     println!(
         "{:?}",
-        fs::read_to_string("sample.txt")
+        fs::read_to_string("input.txt")
             .unwrap()
             .lines()
             .map(|line| line
